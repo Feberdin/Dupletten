@@ -1,0 +1,43 @@
+{# 
+Zweck:
+    Gemeinsames Layout fuer die Arr-Duplikat-Weboberflaeche.
+Input/Output:
+    Erwartet von Unterseiten nur den eigentlichen Seiteninhalt.
+Wichtige Invarianten:
+    - Layout und Styles bleiben zentral an einer Stelle.
+    - Der visuelle Rahmen erklaert direkt, was das Tool macht.
+Debugging:
+    Wenn Unterseiten leer bleiben, zuerst pruefen, ob der Block `content`
+    gerendert wird und ob `/static/styles.css` geladen wird.
+#}
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Arr Duplicate Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+  </head>
+  <body>
+    <div class="page-shell">
+      <header class="hero">
+        <div class="hero-copy">
+          <p class="eyebrow">Feberdin Tooling</p>
+          <h1>Radarr- und Sonarr-Duplikate sichtbar machen</h1>
+          <p class="hero-text">
+            Diese erste Version zeigt doppelte Bibliothekseintraege aus Radarr und Sonarr.
+            Darauf koennen wir spaeter sichere Aktionen wie „gesehen + 14 Tage loeschen“ aufbauen.
+          </p>
+        </div>
+        <div class="hero-actions">
+          <a class="button-primary" href="/">Neu laden</a>
+          <a class="button-secondary" href="/api/duplicates">JSON ansehen</a>
+        </div>
+      </header>
+
+      <main class="content">
+        {% block content %}{% endblock %}
+      </main>
+    </div>
+  </body>
+</html>

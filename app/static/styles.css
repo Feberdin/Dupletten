@@ -1,0 +1,345 @@
+/*
+Zweck:
+    Visuelles Erscheinungsbild fuer das Arr-Duplikat-Dashboard.
+Input/Output:
+    Formatiert Layout, Statuskarten und Duplikatlisten fuer Desktop und Mobil.
+Wichtige Invarianten:
+    - Status, Fehler und leere Zustaende muessen auf einen Blick lesbar sein.
+    - Die Oberflaeche bleibt ohne JavaScript bedienbar.
+Debugging:
+    Bei Layoutproblemen zuerst im Browser pruefen, ob diese Datei geladen wird.
+*/
+
+:root {
+  --bg: #f5efe5;
+  --surface: rgba(255, 252, 247, 0.88);
+  --surface-strong: #fffaf2;
+  --text: #241d1a;
+  --muted: #695f59;
+  --border: rgba(78, 58, 40, 0.12);
+  --shadow: 0 18px 38px rgba(73, 48, 26, 0.12);
+  --success: #2f7d4d;
+  --danger: #a33c2a;
+  --disabled: #7f7a72;
+  --accent: #bc5a33;
+  --accent-dark: #7e3519;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  color: var(--text);
+  background:
+    radial-gradient(circle at top left, rgba(222, 148, 107, 0.28), transparent 28%),
+    radial-gradient(circle at right, rgba(163, 120, 55, 0.16), transparent 24%),
+    linear-gradient(180deg, #f8f2e9 0%, #f0e7d8 100%);
+  font-family: "Avenir Next", "Trebuchet MS", "Segoe UI", sans-serif;
+}
+
+.page-shell {
+  width: min(1200px, calc(100% - 32px));
+  margin: 0 auto;
+  padding: 32px 0 56px;
+}
+
+.hero {
+  display: flex;
+  justify-content: space-between;
+  gap: 24px;
+  align-items: flex-end;
+  padding: 28px;
+  border: 1px solid rgba(91, 58, 20, 0.09);
+  border-radius: 28px;
+  box-shadow: var(--shadow);
+  background:
+    linear-gradient(135deg, rgba(255, 249, 239, 0.96), rgba(246, 232, 212, 0.84)),
+    var(--surface);
+}
+
+.eyebrow,
+.section-kicker {
+  margin: 0 0 8px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  font-size: 0.74rem;
+  color: var(--accent-dark);
+}
+
+.hero h1,
+.section-heading h2 {
+  margin: 0;
+  font-family: Georgia, "Times New Roman", serif;
+  letter-spacing: -0.02em;
+}
+
+.hero h1 {
+  font-size: clamp(2rem, 4vw, 3.2rem);
+  max-width: 14ch;
+}
+
+.hero-text,
+.section-note,
+.service-message,
+.empty-state p,
+.duplicate-head p {
+  color: var(--muted);
+}
+
+.hero-text {
+  max-width: 60ch;
+  margin: 12px 0 0;
+  line-height: 1.6;
+}
+
+.hero-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.button-primary,
+.button-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 18px;
+  border-radius: 999px;
+  text-decoration: none;
+  font-weight: 700;
+  transition: transform 180ms ease, box-shadow 180ms ease;
+}
+
+.button-primary {
+  color: white;
+  background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+  box-shadow: 0 14px 22px rgba(126, 53, 25, 0.24);
+}
+
+.button-secondary {
+  color: var(--accent-dark);
+  background: rgba(255, 255, 255, 0.62);
+  border: 1px solid rgba(126, 53, 25, 0.12);
+}
+
+.button-primary:hover,
+.button-secondary:hover {
+  transform: translateY(-1px);
+}
+
+.content {
+  display: grid;
+  gap: 22px;
+  margin-top: 24px;
+}
+
+.summary-grid,
+.service-grid,
+.duplicate-grid {
+  display: grid;
+  gap: 16px;
+}
+
+.summary-grid {
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+}
+
+.summary-card,
+.panel,
+.duplicate-card,
+.service-card,
+.empty-state {
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+}
+
+.summary-card {
+  padding: 18px 20px;
+}
+
+.summary-label {
+  margin: 0;
+  font-size: 0.84rem;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+}
+
+.summary-value {
+  margin: 8px 0 0;
+  font-size: 2rem;
+  font-weight: 800;
+}
+
+.summary-small {
+  font-size: 1.1rem;
+  line-height: 1.45;
+}
+
+.panel {
+  padding: 22px;
+}
+
+.section-heading {
+  display: flex;
+  justify-content: space-between;
+  gap: 24px;
+  align-items: end;
+  margin-bottom: 16px;
+}
+
+.service-grid {
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+}
+
+.service-card,
+.duplicate-card,
+.empty-state {
+  padding: 18px;
+}
+
+.service-head,
+.duplicate-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: flex-start;
+}
+
+.service-head h3,
+.duplicate-head h3,
+.empty-state h3 {
+  margin: 0;
+}
+
+.state-pill,
+.reason-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  background: rgba(36, 29, 26, 0.06);
+}
+
+.state-connected .state-pill {
+  color: var(--success);
+  background: rgba(47, 125, 77, 0.12);
+}
+
+.state-error .state-pill {
+  color: var(--danger);
+  background: rgba(163, 60, 42, 0.12);
+}
+
+.state-disabled .state-pill {
+  color: var(--disabled);
+  background: rgba(127, 122, 114, 0.14);
+}
+
+.metrics,
+.inline-metrics {
+  display: grid;
+  gap: 10px;
+  margin: 14px 0 0;
+}
+
+.metrics {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.metrics div,
+.inline-metrics div {
+  padding: 10px 12px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.58);
+}
+
+.metrics dt,
+.inline-metrics dt {
+  font-size: 0.78rem;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.metrics dd,
+.inline-metrics dd {
+  margin: 6px 0 0;
+  font-weight: 700;
+}
+
+.duplicate-grid {
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+}
+
+.reason-list {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.reason-pill {
+  color: var(--accent-dark);
+  background: rgba(188, 90, 51, 0.12);
+}
+
+.item-list {
+  list-style: none;
+  padding: 0;
+  margin: 18px 0 0;
+  display: grid;
+  gap: 12px;
+}
+
+.item-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 16px;
+  border-radius: 18px;
+  background: var(--surface-strong);
+  border: 1px solid rgba(78, 58, 40, 0.08);
+}
+
+.item-title {
+  margin: 0;
+  font-weight: 700;
+}
+
+.item-path {
+  margin: 6px 0 0;
+  color: var(--muted);
+  font-size: 0.93rem;
+  word-break: break-word;
+}
+
+.inline-metrics {
+  grid-template-columns: repeat(3, minmax(76px, 1fr));
+  min-width: 290px;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 28px;
+}
+
+@media (max-width: 860px) {
+  .hero,
+  .section-heading,
+  .item-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .inline-metrics {
+    min-width: 0;
+  }
+}

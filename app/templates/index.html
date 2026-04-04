@@ -1,0 +1,189 @@
+{#
+Zweck:
+    Dashboard-Ansicht fuer Service-Status und erkannte Duplikate.
+Input/Output:
+    Erwartet ein `dashboard`-Objekt mit Services, Filmgruppen und Seriengruppen.
+Wichtige Invarianten:
+    - Fehlende Dienste und echte Duplikate werden klar getrennt dargestellt.
+    - Die Seite bleibt auch bei Teilfehlern nutzbar.
+Debugging:
+    Wenn Werte leer sind, `/api/duplicates` vergleichen: stimmen die Daten dort,
+    liegt das Problem im Template und nicht im Backend.
+#}
+{% extends "base.html" %}
+
+{% block content %}
+  <section class="summary-grid">
+    <article class="summary-card">
+      <p class="summary-label">Gefundene Gruppen</p>
+      <p class="summary-value">{{ dashboard.total_duplicate_groups }}</p>
+    </article>
+    <article class="summary-card">
+      <p class="summary-label">Betroffene Eintraege</p>
+      <p class="summary-value">{{ dashboard.total_duplicate_items }}</p>
+    </article>
+    <article class="summary-card">
+      <p class="summary-label">Stand</p>
+      <p class="summary-value summary-small">{{ dashboard.generated_at | timestamp }}</p>
+    </article>
+  </section>
+
+  <section class="panel">
+    <div class="section-heading">
+      <div>
+        <p class="section-kicker">Verbindungen</p>
+        <h2>Radarr und Sonarr Status</h2>
+      </div>
+    </div>
+    <div class="service-grid">
+      {% for service in dashboard.services %}
+        <article class="service-card state-{{ service.state }}">
+          <header class="service-head">
+            <h3>{{ service.name }}</h3>
+            <span class="state-pill">{{ service.state }}</span>
+          </header>
+          <p class="service-message">{{ service.message }}</p>
+          <dl class="metrics">
+            <div>
+              <dt>URL</dt>
+              <dd>{{ service.base_url }}</dd>
+            </div>
+            <div>
+              <dt>Version</dt>
+              <dd>{{ service.version or "unbekannt" }}</dd>
+            </div>
+            <div>
+              <dt>Eintraege</dt>
+              <dd>{{ service.item_count }}</dd>
+            </div>
+            <div>
+              <dt>Duplikatgruppen</dt>
+              <dd>{{ service.duplicate_group_count }}</dd>
+            </div>
+          </dl>
+        </article>
+      {% endfor %}
+    </div>
+  </section>
+
+  <section class="panel">
+    <div class="section-heading">
+      <div>
+        <p class="section-kicker">Filme</p>
+        <h2>Doppelte Filme</h2>
+      </div>
+    </div>
+    {% if dashboard.movie_duplicates %}
+      <div class="duplicate-grid">
+        {% for group in dashboard.movie_duplicates %}
+          <article class="duplicate-card">
+            <header class="duplicate-head">
+              <div>
+                <h3>{{ group.label }}</h3>
+                <p>{{ group.item_count }} Eintraege</p>
+              </div>
+              <div class="reason-list">
+                {% for reason in group.reasons %}
+                  <span class="reason-pill">{{ reason.label }}</span>
+                {% endfor %}
+              </div>
+            </header>
+            <ul class="item-list">
+              {% for item in group.items %}
+                <li class="item-row">
+                  <div>
+                    <p class="item-title">{{ item.title }}</p>
+                    <p class="item-path">{{ item.path or "Kein Pfad gesetzt" }}</p>
+                  </div>
+                  <dl class="inline-metrics">
+                    <div>
+                      <dt>Jahr</dt>
+                      <dd>{{ item.year or "?" }}</dd>
+                    </div>
+                    <div>
+                      <dt>Dateien</dt>
+                      <dd>{{ item.file_count }}</dd>
+                    </div>
+                    <div>
+                      <dt>Groesse</dt>
+                      <dd>{{ item.size_on_disk | bytesize }}</dd>
+                    </div>
+                  </dl>
+                </li>
+              {% endfor %}
+            </ul>
+          </article>
+        {% endfor %}
+      </div>
+    {% else %}
+      <article class="empty-state">
+        <h3>Keine Film-Duplikate gefunden</h3>
+        <p>
+          Entweder sind keine doppelten Filme vorhanden oder Radarr ist noch nicht korrekt verbunden.
+        </p>
+      </article>
+    {% endif %}
+  </section>
+
+  <section class="panel">
+    <div class="section-heading">
+      <div>
+        <p class="section-kicker">Serien</p>
+        <h2>Doppelte Serien</h2>
+      </div>
+      <p class="section-note">
+        Naechster sinnvoller Ausbau: Markierung und spaeteres Loeschen gesehener Serien nach Wartezeit.
+      </p>
+    </div>
+    {% if dashboard.series_duplicates %}
+      <div class="duplicate-grid">
+        {% for group in dashboard.series_duplicates %}
+          <article class="duplicate-card">
+            <header class="duplicate-head">
+              <div>
+                <h3>{{ group.label }}</h3>
+                <p>{{ group.item_count }} Eintraege</p>
+              </div>
+              <div class="reason-list">
+                {% for reason in group.reasons %}
+                  <span class="reason-pill">{{ reason.label }}</span>
+                {% endfor %}
+              </div>
+            </header>
+            <ul class="item-list">
+              {% for item in group.items %}
+                <li class="item-row">
+                  <div>
+                    <p class="item-title">{{ item.title }}</p>
+                    <p class="item-path">{{ item.path or "Kein Pfad gesetzt" }}</p>
+                  </div>
+                  <dl class="inline-metrics">
+                    <div>
+                      <dt>Jahr</dt>
+                      <dd>{{ item.year or "?" }}</dd>
+                    </div>
+                    <div>
+                      <dt>Episoden</dt>
+                      <dd>{{ item.file_count }}</dd>
+                    </div>
+                    <div>
+                      <dt>Groesse</dt>
+                      <dd>{{ item.size_on_disk | bytesize }}</dd>
+                    </div>
+                  </dl>
+                </li>
+              {% endfor %}
+            </ul>
+          </article>
+        {% endfor %}
+      </div>
+    {% else %}
+      <article class="empty-state">
+        <h3>Keine Serien-Duplikate gefunden</h3>
+        <p>
+          Entweder sind keine doppelten Serien vorhanden oder Sonarr ist noch nicht korrekt verbunden.
+        </p>
+      </article>
+    {% endif %}
+  </section>
+{% endblock %}

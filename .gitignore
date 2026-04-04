@@ -1,0 +1,17 @@
+# Zweck:
+#   Ignoriert nur lokale Laufartefakte fuer dieses Medien-Duplikat-Tool.
+# Input/Output:
+#   Betrifft temporaere Dateien, Debug-Logs und Editor-Artefakte.
+# Wichtige Invarianten:
+#   Quellcode, Dokumentation und Tests bleiben versionierbar.
+# Debugging:
+#   Falls ein neues lokales Artefakt stoert, hier gezielt ergaenzen.
+
+.DS_Store
+*.log
+tmp/
+.env
+.venv/
+__pycache__/
+*.pyc
+*.pyo

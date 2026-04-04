@@ -1,0 +1,93 @@
+<?xml version="1.0"?>
+<!--
+Zweck:
+  Unraid-Docker-Template fuer das Arr-Duplicates-Webtool.
+Input/Output:
+  Diese XML wird nach /boot/config/plugins/dockerMan/templates-user kopiert und
+  erscheint danach in Unraid als Container-Vorlage.
+Wichtige Invarianten:
+  - Die Repository-Angabe ist aktuell eine Vorlage und muss zu einem echten
+    Docker-Image passen, bevor der Container gestartet werden kann.
+  - API-Keys werden als maskierte Variablen eingetragen.
+  - Das Tool liest in dieser Version nur aus Radarr und Sonarr, es loescht noch
+    nichts.
+Debugging:
+  Wenn der Container in Unraid nicht startet, zuerst Repository, Port-Mapping
+  und die vier Arr-Variablen pruefen.
+-->
+<Container version="2">
+  <Name>Arr-Duplicates</Name>
+  <Repository>ghcr.io/feberdin/arr-duplicates:latest</Repository>
+  <Registry>https://ghcr.io</Registry>
+  <Network>bridge</Network>
+  <MyIP/>
+  <Shell>sh</Shell>
+  <Privileged>false</Privileged>
+  <Support>https://github.com/Feberdin/Dupletten</Support>
+  <Project>https://github.com/Feberdin/Dupletten</Project>
+  <Overview>Web-Dashboard fuer doppelte Filme und Serien in Radarr und Sonarr. Diese erste Version verbindet sich per API mit beiden Diensten, zeigt Dubletten im Browser an und ist als Grundlage fuer spaetere Regeln wie "gesehen + 14 Tage spaeter loeschen" gedacht.</Overview>
+  <Category>Tools:MediaApp:Video</Category>
+  <WebUI>http://[IP]:[PORT:8000]/</WebUI>
+  <TemplateURL/>
+  <Icon/>
+  <ExtraParams/>
+  <PostArgs/>
+
+  <!--
+  Warum existiert das?
+    Das Webinterface soll in Unraid sauber als Port-Mapping sichtbar sein.
+  Was passiert hier?
+    Host-Port 8080 kann in Unraid geaendert werden, intern bleibt der Container
+    auf Port 8000.
+  -->
+  <Config Name="WebUI Port" Target="8000" Default="8080" Mode="tcp" Description="Port fuer das Arr-Duplicates-Webinterface auf deinem Unraid-Host." Type="Port" Display="always" Required="true" Mask="false"></Config>
+
+  <!--
+  Warum existiert das?
+    Die App braucht die Radarr-Basis-URL fuer API-Abfragen.
+  Beispiel:
+    http://192.168.178.20:7878
+  -->
+  <Config Name="Radarr URL" Target="RADARR_URL" Default="http://radarr:7878" Mode="" Description="Basis-URL deiner Radarr-Instanz, inklusive Port." Type="Variable" Display="always" Required="true" Mask="false"></Config>
+
+  <!--
+  Warum existiert das?
+    Authentifizierung gegen Radarr.
+  Was passiert hier?
+    Der Wert wird als X-Api-Key Header gesendet.
+  -->
+  <Config Name="Radarr API Key" Target="RADARR_API_KEY" Default="" Mode="" Description="API-Key aus Radarr unter Settings -> General." Type="Variable" Display="always" Required="true" Mask="true"></Config>
+
+  <!--
+  Warum existiert das?
+    Die App braucht die Sonarr-Basis-URL fuer API-Abfragen.
+  Beispiel:
+    http://192.168.178.21:8989
+  -->
+  <Config Name="Sonarr URL" Target="SONARR_URL" Default="http://sonarr:8989" Mode="" Description="Basis-URL deiner Sonarr-Instanz, inklusive Port." Type="Variable" Display="always" Required="true" Mask="false"></Config>
+
+  <!--
+  Warum existiert das?
+    Authentifizierung gegen Sonarr.
+  Was passiert hier?
+    Der Wert wird als X-Api-Key Header gesendet.
+  -->
+  <Config Name="Sonarr API Key" Target="SONARR_API_KEY" Default="" Mode="" Description="API-Key aus Sonarr unter Settings -> General." Type="Variable" Display="always" Required="true" Mask="true"></Config>
+
+  <!--
+  Warum existiert das?
+    Beim Debuggen sollen API- und Statusfehler nachvollziehbar sein.
+  Beispiel:
+    INFO oder DEBUG
+  -->
+  <Config Name="Log Level" Target="LOG_LEVEL" Default="INFO" Mode="" Description="INFO fuer normal, DEBUG fuer ausfuehrliche Fehlersuche." Type="Variable" Display="advanced" Required="false" Mask="false"></Config>
+
+  <!--
+  Warum existiert das?
+    Langsame Reverse Proxies oder entfernte Arr-Instanzen koennen laenger
+    brauchen.
+  Beispiel:
+    10 oder 20
+  -->
+  <Config Name="Request Timeout" Target="REQUEST_TIMEOUT_SECONDS" Default="10" Mode="" Description="Timeout fuer API-Anfragen in Sekunden." Type="Variable" Display="advanced" Required="false" Mask="false"></Config>
+</Container>

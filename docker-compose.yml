@@ -1,0 +1,10 @@
+services:
+  arr-duplicates:
+    build:
+      context: .
+    container_name: arr-duplicates
+    restart: unless-stopped
+    env_file:
+      - .env
+    ports:
+      - "8080:8000"

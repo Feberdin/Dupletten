@@ -1,0 +1,17 @@
+# Zweck:
+#   Haelt unnoetige lokale Dateien aus dem Docker-Build-Kontext heraus.
+# Input/Output:
+#   Ignoriert virtuelle Umgebungen, Tests und Caches beim Image-Build.
+# Wichtige Invarianten:
+#   Nur das noetige Laufzeitartefakt landet im Container.
+# Debugging:
+#   Wenn eine Datei im Container fehlt, zuerst hier pruefen.
+
+.git
+.gitignore
+.venv
+__pycache__
+tests
+*.pyc
+*.pyo
+.env
