@@ -142,7 +142,7 @@ http://localhost:8000
 4. Erst die Statuskarten lesen.
 5. Danach die Duplikatgruppen fuer Filme und Serien pruefen.
 
-# So debugst du es
+# Troubleshooting und Debugging
 
 ## Typische Fehler
 
